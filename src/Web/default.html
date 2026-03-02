@@ -114,37 +114,6 @@
             width: 140px;
         }
 
-        .sidebar-logo-collapsed {
-            display: flex;
-            flex-direction: column;
-            min-height: calc(100vh - 48px);
-            width: calc(100% - var(--sidebar-width) - 72px);
-            background: #fff;
-            margin: 24px 24px 24px calc(var(--sidebar-width) + 48px);
-            border-radius: 30px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.12), 0 1.5px 8px 0 rgba(0, 0, 0, 0.06);
-            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 100;
-
-            .sidebar.collapsed~.main-wrapper {
-                margin-left: 84px;
-                width: calc(100% - 108px - 48px);
-            }
-
-            color: #555;
-            display: flex;
-            align-items: center;
-            /* Pill shape on right side */
-            margin-right: 15px;
-            margin-left: 15px;
-            margin-bottom: 8px;
-            /* Creates space for the rounded edge */
-            border-radius: 50px 50px 50px 50px;
-            /* Creates the perfect "one-sided pill" */
-            padding: 12px 25px;
-            font-weight: 500;
-            transition: all 0.2s ease-in-out;
-        }
 
         .nav-link i {
             font-size: 1.1rem;
@@ -152,11 +121,6 @@
 
         .nav-link span {
             margin-left: 12px;
-        }
-
-        .nav {
-            margin-left: -9px !important;
-            margin-right: 5px !important;
         }
 
         /* Active State (Purple Pill) */
@@ -208,8 +172,19 @@
             width: calc(100% - var(--sidebar-width) - 72px);
             background: #fff;
             margin: 24px 24px 24px calc(var(--sidebar-width) + 48px);
-            border-radius: 30px;
-            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.12), 0 1.5px 8px 0 rgba(0,0,0,0.06);
+            border-radius: 21px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.12), 0 1.5px 8px 0 rgba(0, 0, 0, 0.06);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+
+        .footer-wrapper {
+            flex-shrink: 0;
+            padding: 10px 30px;
+            background: #fff;
+            border-bottom-left-radius: 21px;
+            border-bottom-right-radius: 21px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.12), 0 1.5px 8px 0 rgba(0, 0, 0, 0.06);
             transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 100;
         }
@@ -239,15 +214,6 @@
             padding: 0 30px;
             margin-bottom: 10px;
         }
-
-        /* 4. Footer stays fixed at bottom */
-        .content-footer {
-            flex-shrink: 0;
-            padding: 10px 30px;
-            border-top: 1px solid #eee;
-            background: #fff;
-        }
-
         /* Styling to match your image */
         .table thead th {
             background-color: #fff;
@@ -258,13 +224,6 @@
             /* Keep headers visible while scrolling */
             top: 0;
             z-index: 10;
-        }
-
-        /* 5. Toggle Arrow Button Rounding */
-        #toggle-btn {
-            border-radius: 50%;
-            /* Makes the toggle button circular */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -282,8 +241,7 @@
         <!-- Logo -->
         <div class="sidebar-brand px-3 mb-4" style="position: relative; min-height: 48px;">
             <img class="sidebar-logo-expanded" src="./wwwroot/css/images/right_logo.png" width="140" alt="USPS">
-            <img class="sidebar-logo-collapsed" src="./wwwroot/css/images/left_logo.png" width="40" alt="USPS"
-                style="position:absolute;left:0;top:0;">
+
         </div>
 
         <!-- Links -->
@@ -353,7 +311,7 @@
         </div>
 
         <!-- Fixed Footer -->
-        <div class="content-footer d-flex justify-content-between align-items-center text-muted small">
+        <div class="content-footer d-flex justify-content-between align-items-center text-muted small footer-wrapper">
             <div class="d-flex align-items-center">
                 <span>Items per page</span>
                 <select class="form-select form-select-sm mx-2" style="width: auto;">
@@ -406,7 +364,7 @@
         }
 
         // Set logo on page load based on sidebar state
-        window.addEventListener('DOMContentLoaded', function () {
+        globalThis.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.getElementById('sidebar');
             setSidebarLogo(sidebar.classList.contains('collapsed'));
         });
