@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRS List Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="./wwwroot/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="./wwwroot/lib/bootstrap-icons/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --sidebar-width: 220px;
+            --usps-purple: #6b63d1;
+            --sidebar-bg: #ffffff;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar Container */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            /* Remove border-right for floating effect */
+            border-right: none;
+            padding: 20px 0;
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            height: calc(100vh - 48px);
+            border-radius: 30px;
+            /* Fully rounded corners for floating look */
+            background-color: var(--sidebar-bg);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.18), 0 1.5px 8px 0 rgba(0, 0, 0, 0.08);
+            z-index: 200;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Toggle Button Absolute Position */
+        #toggle-btn {
+            position: absolute;
+            top: 70px;
+            right: -24px;
+            z-index: 100;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0;
+        }
+
+        #toggle-btn:focus {
+            outline: 2px solid var(--usps-purple);
+        }
+
+        #toggle-icon {
+            font-size: 1.3rem;
+            color: #6b63d1;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+
+        /* Collapsed Sidebar */
+        .sidebar.collapsed {
+            width: 60px;
+            min-width: 60px;
+            padding-left: 0;
+            padding-right: 0;
+            left: 24px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar.collapsed #toggle-btn {
+            right: -24px;
+            /* keep button outside */
+        }
+
+        .sidebar.collapsed #toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .sidebar.collapsed .sidebar-brand,
+        .sidebar.collapsed .user-profile,
+        .sidebar.collapsed .nav-link span {
+            display: none !important;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+            margin-right: 0;
+        }
+
+        /* USPS Logo Section */
+        .sidebar-brand {
+            padding: 0 20px 30px 20px;
+        }
+
+        .sidebar-brand img {
+            width: 140px;
+        }
+
+        .sidebar-logo-collapsed {
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 48px);
+            width: calc(100% - var(--sidebar-width) - 72px);
+            background: #fff;
+            margin: 24px 24px 24px calc(var(--sidebar-width) + 48px);
+            border-radius: 30px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.12), 0 1.5px 8px 0 rgba(0, 0, 0, 0.06);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+
+            .sidebar.collapsed~.main-wrapper {
+                margin-left: 84px;
+                width: calc(100% - 108px - 48px);
+            }
+
+            color: #555;
+            display: flex;
+            align-items: center;
+            /* Pill shape on right side */
+            margin-right: 15px;
+            margin-left: 15px;
+            margin-bottom: 8px;
+            /* Creates space for the rounded edge */
+            border-radius: 50px 50px 50px 50px;
+            /* Creates the perfect "one-sided pill" */
+            padding: 12px 25px;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .nav-link i {
+            font-size: 1.1rem;
+        }
+
+        .nav-link span {
+            margin-left: 12px;
+        }
+
+        .nav {
+            margin-left: -9px !important;
+            margin-right: 5px !important;
+        }
+
+        /* Active State (Purple Pill) */
+        .nav-link.active {
+            background-color: var(--usps-purple) !important;
+            color: #fff !important;
+        }
+
+        .nav-link:hover:not(.active) {
+            background-color: #f0f0ff;
+            color: var(--usps-purple);
+        }
+
+        /* Bottom Profile Section */
+        .user-profile {
+            margin-top: auto;
+            padding: 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar-circle {
+            background: #e9ecef;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: #666;
+            margin-right: 10px;
+            width: 40px;
+            height: 40px;
+            background-color: #f0f0f5;
+
+        }
+
+        .user-info {
+            font-size: 0.85rem;
+            line-height: 1.2;
+        }
+
+        /* 1. Ensure the main content fills the screen height */
+        .main-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 48px);
+            width: calc(100% - var(--sidebar-width) - 72px);
+            background: #fff;
+            margin: 24px 24px 24px calc(var(--sidebar-width) + 48px);
+            border-radius: 30px;
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.12), 0 1.5px 8px 0 rgba(0,0,0,0.06);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+
+        .sidebar.collapsed~.main-wrapper {
+            margin-left: 84px;
+            width: calc(100% - 108px - 48px);
+        }
+
+
+        /* 2. Header and Search bar remain fixed at top */
+        .content-header {
+            padding: 20px 30px;
+            flex-shrink: 0;
+        }
+
+        .toolbar {
+            padding: 0 30px 15px 30px;
+            flex-shrink: 0;
+        }
+
+        /* 3. The Table Container takes up all REMAINING space */
+        .dynamic-table-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            /* Scrollbar appears here if rows are many */
+            padding: 0 30px;
+            margin-bottom: 10px;
+        }
+
+        /* 4. Footer stays fixed at bottom */
+        .content-footer {
+            flex-shrink: 0;
+            padding: 10px 30px;
+            border-top: 1px solid #eee;
+            background: #fff;
+        }
+
+        /* Styling to match your image */
+        .table thead th {
+            background-color: #fff;
+            color: #6c757d;
+            font-weight: 500;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            /* Keep headers visible while scrolling */
+            top: 0;
+            z-index: 10;
+        }
+
+        /* 5. Toggle Arrow Button Rounding */
+        #toggle-btn {
+            border-radius: 50%;
+            /* Makes the toggle button circular */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <!-- Toggle Arrow Button -->
+        <button id="toggle-btn" onclick="toggleSidebar()" onkeydown="handleToggleKeydown(event)"
+            aria-label="Toggle sidebar">
+            <i id="toggle-icon" class="bi bi-chevron-left"></i>
+        </button>
+
+        <!-- Logo -->
+        <div class="sidebar-brand px-3 mb-4" style="position: relative; min-height: 48px;">
+            <img class="sidebar-logo-expanded" src="./wwwroot/css/images/right_logo.png" width="140" alt="USPS">
+            <img class="sidebar-logo-collapsed" src="./wwwroot/css/images/left_logo.png" width="40" alt="USPS"
+                style="position:absolute;left:0;top:0;">
+        </div>
+
+        <!-- Links -->
+        <nav class="nav flex-column" aria-label="Main navigation">
+            <a class="nav-link active" href="#"><i class="bi bi-display"></i> <span>CRS</span></a>
+            <a class="nav-link" href="#"><i class="bi bi-gear"></i> <span>OPR</span></a>
+            <a class="nav-link" href="#"><i class="bi bi-clock"></i> <span>Clock Rings</span></a>
+            <a class="nav-link" href="#"><i class="bi bi-people"></i> <span>Badges</span></a>
+            <a class="nav-link" href="#"><i class="bi bi-link-45deg"></i> <span>TACS</span></a>
+        </nav>
+
+        <!-- Profile Section -->
+        <div class="user-profile">
+            <div class="avatar-circle">CU</div>
+            <div class="user-info">
+                <div class="fw-bold" style="font-size: 0.85rem;">CF User</div>
+                <div class="text-muted" style="font-size: 0.75rem;">User</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <!-- Header Section -->
+        <div class="content-header d-flex justify-content-between align-items-center">
+            <h2 class="fw-bold m-0">CRS List</h2>
+            <button class="btn btn-primary rounded-pill px-4" style="background-color: #6b63d1; border:none;">
+                Add CRS <i class="bi bi-plus-circle ms-1"></i>
+            </button>
+        </div>
+
+        <!-- Search/Toolbar -->
+        <div class="toolbar d-flex justify-content-between">
+            <div class="input-group w-50 border rounded-3 bg-white">
+                <span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" class="form-control border-0 shadow-none" placeholder="Search">
+            </div>
+            <button class="btn btn-link text-dark text-decoration-none border rounded-3 px-3 bg-white">
+                Export <i class="bi bi-download ms-1"></i>
+            </button>
+        </div>
+
+        <!-- Dynamic Table Area -->
+        <div class="dynamic-table-container">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>CRS Name <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                        <th>Reader ID <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                        <th>Reset Timeout</th>
+                        <th>Confirmation Timeout</th>
+                        <th>Available Action</th>
+                        <th>Area</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- You can add 50 rows here and the footer will never move -->
+                    <tr>
+                        <td class="text-primary fw-bold">CRS-001</td>
+                        <td>130529</td>
+                        <td>90 seconds</td>
+                        <td>30 seconds</td>
+                        <td class="small">BT, OL, IL, ET, MV, TR</td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Fixed Footer -->
+        <div class="content-footer d-flex justify-content-between align-items-center text-muted small">
+            <div class="d-flex align-items-center">
+                <span>Items per page</span>
+                <select class="form-select form-select-sm mx-2" style="width: auto;">
+                    <option>10</option>
+                </select>
+                <span>1-1 Items of 1 items</span>
+            </div>
+            <div>
+                <span>1 pages of 1 pages</span>
+                <i class="bi bi-chevron-double-left ms-3 opacity-25"></i>
+                <i class="bi bi-chevron-left ms-2 opacity-25"></i>
+                <i class="bi bi-chevron-right ms-2 opacity-25"></i>
+                <i class="bi bi-chevron-double-right ms-2 opacity-25"></i>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        function setSidebarLogo(collapsed) {
+            const logo = document.getElementById('sidebar-logo');
+            if (logo) {
+                logo.src = collapsed
+                    ? './wwwroot/css/images/left_logo.png'
+                    : './wwwroot/css/images/right_logo.png';
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const icon = document.getElementById('toggle-icon');
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            if (isCollapsed) {
+                sidebar.classList.remove('collapsed');
+                icon.classList.remove('bi-chevron-right');
+                icon.classList.add('bi-chevron-left');
+                setSidebarLogo(false);
+            } else {
+                sidebar.classList.add('collapsed');
+                icon.classList.remove('bi-chevron-left');
+                icon.classList.add('bi-chevron-right');
+                setSidebarLogo(true);
+            }
+        }
+
+        function handleToggleKeydown(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleSidebar();
+            }
+        }
+
+        // Set logo on page load based on sidebar state
+        window.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            setSidebarLogo(sidebar.classList.contains('collapsed'));
+        });
+    </script>
+    <!--Vanilla Js-->
+    <script src="./wwwroot/lib/vanillajs/vanilla.js"></script>
+    <!-- Bootstrap Bundle JS -->
+    <script src="./wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
